@@ -4,8 +4,12 @@ git clone https://github.com/taodd/cephtrace
 git submodule update --init --recursive
 
 Prerequisite packages:
+for ubuntu
 sudo apt-get install clang libelf-dev libc6-dev-i386 libdw-dev
 sudo apt-get install ceph-osd-dbgsym //Refer https://wiki.ubuntu.com/Debug%20Symbol%20Packages to Enable dbgsym repo  
+
+for el8
+sudo dnf install elfutils-libelf-devel clang libdwarf-devel elfutils-devel
 
 Build:
 1. cd cephtrace

@@ -64,7 +64,7 @@ $(BPFTOOL): | $(BPFTOOL_OUTPUT)
 # Build BPF Code
 $(OUTPUT)/%.bpf.o: $(OSDTRACE_SRC)/%.bpf.c $(LIBBPF_OBJ) | $(OUTPUT) $(BPFTOOL)
 	$(call msg,BPF,$@)
-	$(CLANG)  -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH) $(INCLUDES) $(CLANG_BPF_SYS_INCLUDES) -c $< -o $(patsubst %.bpf.o,%.tmp.bpf.o,$@) 
+	$(CLANG)  -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH) -D__x86_64__ $(INCLUDES) $(CLANG_BPF_SYS_INCLUDES) -c $< -o $(patsubst %.bpf.o,%.tmp.bpf.o,$@) 
 	$(BPFTOOL) gen object $@ $(patsubst %.bpf.o,%.tmp.bpf.o,$@)
 
 # Generate BPF skeletons
@@ -73,7 +73,7 @@ $(OUTPUT)/%.skel.h: $(OUTPUT)/%.bpf.o | $(OUTPUT) $(BPFTOOL)
 	$(BPFTOOL) gen skeleton $< > $@
 
 $(OUTPUT)/osdtrace.o: $(OSDTRACE_SRC)/osdtrace.cc $(OSDTRACE_SRC)/*.h $(OUTPUT)/osdtrace.skel.h | $(OUTPUT) $(LIBBPF_OBJ)
-	$(CXX) -g $(INCLUDES) -c -o $@ $<
+	$(CXX) -g $(INCLUDES) -I /usr/include -c -o $@ $<
 
 $(OUTPUT)/dwarf_parser.o: $(OSDTRACE_SRC)/dwarf_parser.cc $(OSDTRACE_SRC)/*.h $(OUTPUT)/osdtrace.skel.h | $(OUTPUT) $(LIBBPF_OBJ)
 	$(CXX) -g $(INCLUDES) -c -o $@ $<

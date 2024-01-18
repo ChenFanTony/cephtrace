@@ -1,7 +1,7 @@
 #ifndef DWARF_PARSER_H
 #define DWARF_PARSER_H
 
-#include <dwarf.h>
+#include <libdwarf/dwarf.h>
 #include <elf.h>
 #include <elfutils/libdw.h>
 #include <elfutils/libdwfl.h>
