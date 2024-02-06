@@ -196,6 +196,7 @@ static __u64 bootstamp = 0;
 int threshold = 0; //in millisecond
 int probe_osdid = -1;
 
+std::string path = "/usr/bin/ceph-osd";
 
 static __u64 cnt = 0;
 static int libbpf_print_fn(enum libbpf_print_level level, const char *format,
@@ -315,28 +316,31 @@ int exists(int id) {
 }
 
 int osd_pid_to_id(__u32 pid) {
-  for (int i = 0; i < num_osd; ++i) {
-    if (pids[i] == (int)pid) {
-      return osds[i];
+    for (int i = 0; i < num_osd; ++i) {
+        if (pids[i] == (int)pid) {
+            return osds[i];
+        }
     }
-  }
-  // First time, read from /proc/<pid>/cmdline
-  char path_cmdline[50];
-  char pname[200];
-  int id = 0;
-  memset(path_cmdline, 0, sizeof(path_cmdline));
-  snprintf(path_cmdline, sizeof(path_cmdline), "/proc/%d/cmdline", pid);
-  int fd = open(path_cmdline, O_RDONLY);
-  if (read(fd, pname, 200) >= 0) {
-    int start = 41;
-    while (pname[start] != 0 && start < 200) {
-      id *= 10;
-      id += pname[start] - '0';
-      ++start;
+    // First time, read from /proc/<pid>/cmdline
+    int id = -1;
+    std::string cmdline = "/proc/" + to_string(pid) + "/cmdline";
+ 
+    std::ifstream path_cmdline(cmdline);
+    std::string str, str_id("");
+    std::getline(path_cmdline, str);
+    int pos = 0;
+    if (str.find("-i") != string::npos && pos < 200) {
+        pos = str.find("-i");
+        pos += 3;
+        while (str[pos] >= '0' && str[pos] <= '9') {
+           str_id.append(1, str[pos]);
+           ++pos;
+	}
     }
-  }
-  close(fd);
-  return id;
+    id = std::stoi(str_id);
+
+    path_cmdline.close();
+    return id;
 }
 
 __u64 to_ns(struct timespec *ts) {
@@ -822,6 +826,7 @@ static int handle_event(void *ctx, void *data, size_t size) {
   if (!exists(osd_id)) {
     osds[num_osd] = osd_id;
     pids[num_osd++] = pid;
+    clog << "osd_id " << osd_id << endl;
   }
   return 0;
 }
@@ -835,7 +840,7 @@ static void handle_lost_event(void *ctx, int cpu, __u64 lost_cnt)
 
 int parse_args(int argc, char **argv) {
   char opt;
-  while ((opt = getopt(argc, argv, ":d:m:t:o:xb")) != -1) {
+  while ((opt = getopt(argc, argv, ":d:m:t:o:xbp:")) != -1) {
     switch (opt) {
       case 'd':
         period = optarg[0] - '0';
@@ -861,6 +866,10 @@ int parse_args(int argc, char **argv) {
 	break;
       case 'o':
 	probe_osdid = stoi(optarg);
+	break;
+      case 'p':
+	if (optarg)
+		path = optarg;
 	break;
       case '?':
         clog << "Unknown option: " << optopt << endl;
@@ -954,8 +963,7 @@ int main(int argc, char **argv) {
 
   clog << "Start to parse ceph dwarf info" << endl;
 
-  //std::string path = "/home/taodd/Git/ceph/build/bin/ceph-osd";
-  std::string path = "/usr/bin/ceph-osd";
+  clog << "binary path " << path << endl;
   DwarfParser dwarfparser(path, osd_probes, probe_units);
   dwarfparser.parse();
 
