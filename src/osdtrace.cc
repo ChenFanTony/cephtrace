@@ -808,8 +808,8 @@ static int handle_event(void *ctx, void *data, size_t size) {
     if (probe_osdid == -1 || probe_osdid == osd_id)
     {
       if (mode == MODE_AVG) {
-	clog << "avg mode needs to be refined" << endl;
-        //handle_avg(val, osd_id);
+	// clog << "avg mode needs to be refined" << endl;
+        handle_avg(val, osd_id);
       } else if (mode == MODE_ALL){
         handle_full(val, osd_id);
       }
@@ -826,7 +826,6 @@ static int handle_event(void *ctx, void *data, size_t size) {
   if (!exists(osd_id)) {
     osds[num_osd] = osd_id;
     pids[num_osd++] = pid;
-    clog << "osd_id " << osd_id << endl;
   }
   return 0;
 }
