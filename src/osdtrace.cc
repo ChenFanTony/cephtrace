@@ -786,7 +786,7 @@ void handle_bluestore(struct bluestore_lat_v *val, int osd_id) {
 	  printf("kv_sync_lat is %lld\n", val->lat/1000);
 	  break;
       default:
-	  //printf("Bluestore lat Not captured yet: %lld\n", val->lat);
+	  //printf("Bluestore lat Not captured yet: %lld %d\n", val->lat, osd_id);
 	  break;
     }
     //printf("idx is %d, lat is %lld\n", val->idx, val->lat);
@@ -897,7 +897,7 @@ void fill_map_hprobes(DwarfParser &dwarfparser, struct bpf_map *hprobes) {
         vfk.fields[i] = vf.fields[i];
       }
       bpf_map__update_elem(hprobes, &key_idx, sizeof(key_idx), &vfk,
-                           sizeof(vfk), 0);
+                           sizeof(vfk), BPF_ANY);
       ++key_idx;
     }
   }
