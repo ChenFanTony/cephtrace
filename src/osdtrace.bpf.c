@@ -346,7 +346,6 @@ int uprobe_enqueue_op(struct pt_regs *ctx) {
 
 SEC("uprobe")
 int uprobe_dequeue_op(struct pt_regs *ctx) {
-  bpf_printk("Entered into uprobe_dequeue_op\n");
 
   struct op_k key;
   memset(&key, 0, sizeof(key));
@@ -358,6 +357,8 @@ int uprobe_dequeue_op(struct pt_regs *ctx) {
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for OpRequestRef should as point
+    vf->fields[1].pointer = true;
     __u64 op_type_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&op_type, sizeof(op_type), (void *)op_type_addr);
   } else {
@@ -374,6 +375,7 @@ int uprobe_dequeue_op(struct pt_regs *ctx) {
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    vf->fields[1].pointer = true;
     __u64 num_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&key.owner, sizeof(key.owner), (void *)num_addr);
   } else {
@@ -385,6 +387,7 @@ int uprobe_dequeue_op(struct pt_regs *ctx) {
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    vf->fields[1].pointer = true;
     __u64 tid_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&key.tid, sizeof(key.tid), (void *)tid_addr);
   } else {

@@ -994,7 +994,7 @@ int main(int argc, char **argv) {
 
     attach_uprobe(skel, dwarfparser, path, "PrimaryLogPG::execute_ctx");
     
-    attach_uprobe(skel, dwarfparser, path, "ECBackend::submit_transaction");
+    attach_uprobe(skel, dwarfparser, path, "ReplicatedBackend::submit_transaction");
 
     attach_uprobe(skel, dwarfparser, path, "OpRequest::mark_flag_point_string");
 
