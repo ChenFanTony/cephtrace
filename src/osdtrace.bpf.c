@@ -228,7 +228,7 @@ int uprobe_enqueue_op(struct pt_regs *ctx) {
     return 0;
   }
 
-  // read _num
+  // read _num (osd id or client id)
   varid++;
   vf = bpf_map_lookup_elem(&hprobes, &varid);
   if (NULL != vf) {
