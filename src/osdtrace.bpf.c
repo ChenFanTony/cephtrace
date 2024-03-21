@@ -921,6 +921,8 @@ int uprobe_do_repop_reply(struct pt_regs *ctx)
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for OpRequestRef should as point
+    vf->fields[1].pointer = true;
     __u64 num_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&key.owner, sizeof(key.owner), (void *)num_addr);
   } else {
@@ -932,6 +934,8 @@ int uprobe_do_repop_reply(struct pt_regs *ctx)
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for OpRequestRef should as point
+    vf->fields[1].pointer = true;
     __u64 tid_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&key.tid, sizeof(key.tid), (void *)tid_addr);
   } else {
@@ -947,6 +951,8 @@ int uprobe_do_repop_reply(struct pt_regs *ctx)
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for OpRequestRef should as point
+    vf->fields[1].pointer = true;
     __u64 osdid_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&osdid, sizeof(osdid), (void *)osdid_addr);
   } else {
