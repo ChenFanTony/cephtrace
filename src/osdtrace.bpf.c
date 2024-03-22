@@ -1278,6 +1278,8 @@ int uprobe_repop_commit(struct pt_regs *ctx)
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for RepModifyRef should as point
+    vf->fields[1].pointer = true;
     __u64 len_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&len, sizeof(len), (void *)len_addr);
   } else {
