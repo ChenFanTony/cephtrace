@@ -224,7 +224,7 @@ int uprobe_enqueue_op(struct pt_regs *ctx) {
     bpf_printk("uprobe_enqueue_op got NULL vf at varid %d\n", varid);
   }
   if (op_type != MSG_OSD_OP && op_type != MSG_OSD_REPOP) {
-    bpf_printk("uprobe_enqueue_op got a non osdop/osdrepop %d, ignore\n", op_type);
+    // bpf_printk("uprobe_enqueue_op got a non osdop/osdrepop %d, ignore\n", op_type);
     return 0;
   }
 
@@ -365,7 +365,7 @@ int uprobe_dequeue_op(struct pt_regs *ctx) {
     bpf_printk("uprobe_dequeue_op got NULL vf at varid %d\n", varid);
   }
   if (op_type != MSG_OSD_OP && op_type != MSG_OSD_REPOP) {
-    bpf_printk("uprobe_dequeue_op got non osdop or repop type %d, ignore\n", op_type);
+    // bpf_printk("uprobe_dequeue_op got non osdop or repop type %d, ignore\n", op_type);
     return 0;
   }
 
@@ -563,7 +563,7 @@ int uprobe_queue_transactions(struct pt_regs *ctx) {
           key->owner, key->tid);
     }
   } else {
-    bpf_printk("uprobe_queue_transaction, no previous ptid matched %d\n", ptid);
+    // bpf_printk("uprobe_queue_transaction, no previous ptid matched %d\n", ptid);
   }
   return 0;
 }
@@ -722,7 +722,7 @@ int uprobe_txc_apply_kv(struct pt_regs *ctx) {
 
 SEC("uprobe")
 int uprobe_log_op_stats(struct pt_regs *ctx) {
-  bpf_printk("Entered into uprobe_log_op_stats\n");
+  // bpf_printk("Entered into uprobe_log_op_stats\n");
   int varid = 90;
   struct op_k key;
   memset(&key, 0, sizeof(key));
@@ -1234,7 +1234,7 @@ int uprobe_txc_calc_cost(struct pt_regs *ctx)
 SEC("uprobe")
 int uprobe_repop_commit(struct pt_regs *ctx)
 {
-  bpf_printk("Entered into repop_commit\n");
+  // bpf_printk("Entered into repop_commit\n");
   int varid = 170;
   struct op_k key;
   memset(&key, 0, sizeof(key));
@@ -1243,6 +1243,8 @@ int uprobe_repop_commit(struct pt_regs *ctx)
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for RepModifyRef should as point
+    vf->fields[1].pointer = true;
     __u64 num_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&key.owner, sizeof(key.owner), (void *)num_addr);
   } else {
@@ -1254,6 +1256,8 @@ int uprobe_repop_commit(struct pt_regs *ctx)
   if (NULL != vf) {
     __u64 v = 0;
     v = fetch_register(ctx, vf->varloc.reg);
+    // for RepModifyRef should as point
+    vf->fields[1].pointer = true;
     __u64 tid_addr = fetch_var_member_addr(v, vf);
     bpf_probe_read_user(&key.tid, sizeof(key.tid), (void *)tid_addr);
   } else {
@@ -1263,7 +1267,6 @@ int uprobe_repop_commit(struct pt_regs *ctx)
   key.pid = get_pid();
 
   struct op_v *vp = bpf_map_lookup_elem(&ops, &key);
-  
   if (NULL == vp) { 
     bpf_printk("repop_commit got NULL val at key client %lld tid %lld\n", key.owner, key.tid);
     return 0; 
