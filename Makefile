@@ -24,6 +24,12 @@ INCLUDES = -I$(OUTPUT) $(LIBBPF_UAPI_INCLUDES) -I$(LIBBPF_SRC)
 
 CLANG_BPF_SYS_INCLUDES = $(shell $(CLANG) -v -E - </dev/null 2>&1 | sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }')
 
+ifeq ($(ARCH),x86)
+	EXTRA_INCLUDE = '-D__x86_64__'
+else
+	EXTRA_INCLUDE =
+endif
+
 ifeq ($(V),1)
 	Q =
 	msg =
@@ -64,7 +70,7 @@ $(BPFTOOL): | $(BPFTOOL_OUTPUT)
 # Build BPF Code
 $(OUTPUT)/%.bpf.o: $(OSDTRACE_SRC)/%.bpf.c $(LIBBPF_OBJ) | $(OUTPUT) $(BPFTOOL)
 	$(call msg,BPF,$@)
-	$(CLANG)  -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH) -D__x86_64__ $(INCLUDES) $(CLANG_BPF_SYS_INCLUDES) -c $< -o $(patsubst %.bpf.o,%.tmp.bpf.o,$@) 
+	$(CLANG)  -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH) $(EXTRA_INCLUDE) $(INCLUDES) $(CLANG_BPF_SYS_INCLUDES) -c $< -o $(patsubst %.bpf.o,%.tmp.bpf.o,$@)
 	$(BPFTOOL) gen object $@ $(patsubst %.bpf.o,%.tmp.bpf.o,$@)
 
 # Generate BPF skeletons
