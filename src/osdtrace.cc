@@ -838,7 +838,7 @@ static void handle_lost_event(void *ctx, int cpu, __u64 lost_cnt)
 */
 
 int parse_args(int argc, char **argv) {
-  char opt;
+  int opt;
   while ((opt = getopt(argc, argv, ":d:m:t:o:xbp:")) != -1) {
     switch (opt) {
       case 'd':
