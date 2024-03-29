@@ -73,6 +73,22 @@ __u32 get_tid() {
   return tid;
 }
 
+#ifdef __TARGET_ARCH_arm64
+#define pt_regs user_pt_regs
+__u64 fetch_register(const struct pt_regs *const ctx, int reg) {
+  __u64 v = 0;
+  if (reg >= 0 && reg <= 30)
+    v = ctx->regs[reg];
+  else if (reg == 31)
+    v = ctx->sp;
+  else if (reg == 32)
+    v = ctx->pc;
+  else {
+    bpf_printk("unexpected register used %lld\n", v);
+  }
+  return v;
+}
+#else
 // currently only work for x86_64 arch
 __u64 fetch_register(const struct pt_regs *const ctx, int reg) {
   __u64 v = 0;
@@ -126,6 +142,7 @@ __u64 fetch_register(const struct pt_regs *const ctx, int reg) {
   */
   return v;
 }
+#endif
 
 // deal with member dereference vf->size > 1
 __u64 fetch_var_member_addr(__u64 cur_addr, struct VarField *vf) {
