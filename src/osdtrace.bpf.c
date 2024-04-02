@@ -77,14 +77,35 @@ __u32 get_tid() {
 #define pt_regs user_pt_regs
 __u64 fetch_register(const struct pt_regs *const ctx, int reg) {
   __u64 v = 0;
-  if (reg >= 0 && reg <= 30)
+  // aarch64 args is x0 ~ x8, use other regs bpf verfiy can not be done
+  if (reg == 0)
+    v = ctx->regs[reg];
+  else if (reg == 1)
+    v = ctx->regs[reg];
+  else if (reg == 2)
+    v = ctx->regs[reg];
+  else if (reg == 3)
+    v = ctx->regs[reg];
+  else if (reg == 4)
+    v = ctx->regs[reg];
+  else if (reg == 5)
+    v = ctx->regs[reg];
+  else if (reg == 6)
+    v = ctx->regs[reg];
+  else if (reg == 7)
+    v = ctx->regs[reg];
+  else if (reg == 8)
+    v = ctx->regs[reg];
+//  else if (reg == 9)
+//    v = ctx->regs[reg];
+  else if (reg == 30)
     v = ctx->regs[reg];
   else if (reg == 31)
     v = ctx->sp;
   else if (reg == 32)
     v = ctx->pc;
   else {
-    bpf_printk("unexpected register used %lld\n", v);
+    bpf_printk("unexpected register used %lld\n", reg);
   }
   return v;
 }
