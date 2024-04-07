@@ -77,7 +77,8 @@ __u32 get_tid() {
 #define pt_regs user_pt_regs
 __u64 fetch_register(const struct pt_regs *const ctx, int reg) {
   __u64 v = 0;
-  // aarch64 args is x0 ~ x8, use other regs bpf verfiy can not be done
+  // aarch64 can only check the amount of 11, use more regs
+  // bpf verfiy can not be done
   if (reg == 0)
     v = ctx->regs[reg];
   else if (reg == 1)
@@ -90,15 +91,13 @@ __u64 fetch_register(const struct pt_regs *const ctx, int reg) {
     v = ctx->regs[reg];
   else if (reg == 5)
     v = ctx->regs[reg];
-  else if (reg == 6)
+  else if (reg == 19)
     v = ctx->regs[reg];
-  else if (reg == 7)
+  else if (reg == 20)
     v = ctx->regs[reg];
-  else if (reg == 8)
-    v = ctx->regs[reg];
-//  else if (reg == 9)
-//    v = ctx->regs[reg];
-  else if (reg == 30)
+  else if (reg == 29)  // FP
+    v =  ctx->regs[reg];
+  else if (reg == 30)  // RET
     v = ctx->regs[reg];
   else if (reg == 31)
     v = ctx->sp;
